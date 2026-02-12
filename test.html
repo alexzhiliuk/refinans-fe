@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Document</title>
+	</head>
+	<body>
+
+		<canvas id="canvas" style="background: black;"></canvas>
+		<style>
+
+
+		</style>
+		<!-- <script>
+	const canvas = document.querySelector("#canvas");
+const ctx = canvas.getContext("2d");
+
+// массив объектов с иконками и ссылками
+var icons = [
+  { src: "../img/Alfa-Bank.svg", link: "https://github.com" },
+  { src: "https://cdn-icons-png.flaticon.com/512/174/174857.png", link: "https://linkedin.com" },
+  { src: "https://cdn-icons-png.flaticon.com/512/2111/2111463.png", link: "https://facebook.com" },
+  { src: "https://cdn-icons-png.flaticon.com/512/2111/2111646.png", link: "https://instagram.com" },
+  { src: "https://cdn-icons-png.flaticon.com/512/733/733579.png", link: "https://twitter.com" },
+  { src: "https://cdn-icons-png.flaticon.com/512/1384/1384060.png", link: "https://youtube.com" }
+];
+
+var mouseX = 0,
+    mouseY = 0,
+    circles = [],
+    centerX, centerY,
+    startX, startY,
+    offsetX, offsetY,
+    oldOffsetX, oldOffsetY,
+    scale, i, j,
+    x, y,
+    clicked,
+    HORIZONTAL = 20,
+    VERTICAL = 20,
+    RADIUS = 35,
+    PADDINGX = 10,
+    PADDINGY = 10,
+    SCALE_FACTOR = 250;
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+offsetX = (canvas.width - (RADIUS*2*HORIZONTAL + PADDINGX*(HORIZONTAL-1) + RADIUS + PADDINGX/2))/2 + RADIUS;
+offsetY = (canvas.height - (RADIUS*2*VERTICAL + PADDINGY*(VERTICAL-1)))/2 + RADIUS;
+
+centerX = canvas.width/2;
+centerY = canvas.height/2;
+
+x = 0;
+y = 0;
+
+// создаем массив кругов с иконками
+for(i=0;i<VERTICAL;i++){
+    for(j=0;j<HORIZONTAL;j++){
+        let iconObj = icons[Math.floor(Math.random() * icons.length)];
+        let img = new Image();
+        img.src = iconObj.src;
+
+        circles.push({x:x, y:y, img:img, link:iconObj.link});
+        x += RADIUS*2 + PADDINGX;
+    }
+    x = i%2==0 ? PADDINGX/2 + RADIUS : 0;
+    y += RADIUS*2 + PADDINGY;
+}
+
+// функция отрисовки
+function draw(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    ctx.save();
+    ctx.translate(offsetX, offsetY);
+
+    for(i=0;i<circles.length;i++){
+        ctx.save();
+        scale = getDistance(circles[i]);
+        ctx.translate(circles[i].x, circles[i].y);
+        ctx.translate(RADIUS/2, RADIUS/2);
+        ctx.scale(scale, scale);
+        ctx.translate(-RADIUS/2, -RADIUS/2);
+
+        // рисуем фон круга
+        ctx.beginPath();
+        ctx.arc(RADIUS/2, RADIUS/2, RADIUS, 0, Math.PI*2);
+        ctx.fillStyle = "#ffffffaa"; // прозрачный фон
+        ctx.fill();
+
+        // рисуем иконку
+        const ICON_OFFSET_X = 0; // вправо
+const ICON_OFFSET_Y = 0; // вверх
+const ICON_PADDING = 0; // отступ от края круга
+const ICON_SIZE = RADIUS / 0.8;
+
+
+
+// ctx.drawImage(
+//   circles[i].img,
+//  -ICON_SIZE / 10,
+//   -ICON_SIZE / 10,
+//   ICON_SIZE,
+//   ICON_SIZE
+// );
+
+const boxSize = RADIUS * 2;
+
+const img = circles[i].img;
+
+if (img.complete) {
+  const scaleImg = Math.min(
+    boxSize / img.width,
+    boxSize / img.height
+  );
+
+  const drawW = img.width * scaleImg;
+  const drawH = img.height * scaleImg;
+
+  ctx.drawImage(
+    img,
+    -drawW / 10,
+    -drawH / 10,
+    drawW / 0.8,
+    drawH/0.8
+  );
+}
+
+
+        ctx.restore();
+    }
+
+    ctx.restore();
+    requestAnimationFrame(draw);
+}
+
+draw();
+
+function getDistance(circle){
+    var dx = circle.x - centerX + offsetX;
+    var dy = circle.y - centerY + offsetY;
+    var dist = Math.sqrt(dx*dx + dy*dy);
+    scale = 1 - dist/SCALE_FACTOR;
+    return scale>0 ? scale : 0;
+}
+
+// обработка клика по кругу
+canvas.addEventListener("click", (e)=>{
+    let rect = canvas.getBoundingClientRect();
+    let clickX = e.clientX - rect.left - offsetX;
+    let clickY = e.clientY - rect.top - offsetY;
+
+    for(i=0;i<circles.length;i++){
+        let dx = clickX - circles[i].x;
+        let dy = clickY - circles[i].y;
+        if(Math.sqrt(dx*dx + dy*dy) < RADIUS){
+            window.open(circles[i].link, "_blank");
+        }
+    }
+});
+
+// drag & swipe
+window.addEventListener("touchstart", handleTouch);
+function handleTouch(e){
+    window.addEventListener("touchmove", handleSwipe);
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    oldOffsetX = offsetX;
+    oldOffsetY = offsetY;
+}
+function handleSwipe(e){
+    mouseX = e.changedTouches[0].clientX;
+    mouseY = e.changedTouches[0].clientY;
+    offsetX = oldOffsetX + mouseX - startX;
+    offsetY = oldOffsetY + mouseY - startY;
+}
+window.addEventListener("touchend", () => {
+    window.removeEventListener("touchmove", handleSwipe);
+});
+
+window.addEventListener("mousedown", handleClick);
+function handleClick(e){
+    window.addEventListener("mousemove", handleMouse);
+    window.addEventListener("mouseup", handleRelease);
+    startX = e.clientX;
+    startY = e.clientY;
+    oldOffsetX = offsetX;
+    oldOffsetY = offsetY;
+    canvas.style.cursor = "grabbing";
+}
+function handleMouse(e){
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    offsetX = oldOffsetX + mouseX - startX;
+    offsetY = oldOffsetY + mouseY - startY;
+}
+function handleRelease(){
+    window.removeEventListener("mouseup", handleRelease);
+    window.removeEventListener("mousemove", handleMouse);
+    canvas.style.cursor = "grab";
+}
+
+window.addEventListener("resize", ()=>{
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+    centerX = canvas.width/2;
+    centerY = canvas.height/2;
+});
+
+</script> -->
+
+		<div class="scene">
+			<div class="icons"></div>
+		</div>
+
+		<script>
+const container = document.querySelector('.icons');
+
+const icons = [
+  { src: '../img/Alfa-Bank.svg', link: 'https://github.com' },
+  { src: '../img/pocita-bank.png', link: 'https://linkedin.com' },
+  { src: '../img/Sovcombank.svg', link: 'https://facebook.com' },
+  { src: '../img/vtb.svg', link: 'https://instagram.com' },
+  { src: '../img/sber.svg', link: 'https://twitter.com' },
+];
+
+// === НАСТРОЙКИ ===
+const RADIUS = 70;
+const SIZE = RADIUS * 2;
+const PADDINGX = 10;
+const PADDINGY = 10;
+const SCALE_FACTOR = 250;
+
+let HORIZONTAL;
+let VERTICAL;
+
+let circles = [];
+
+let offsetX = 0;
+let offsetY = 0;
+let oldOffsetX = 0;
+let oldOffsetY = 0;
+let startX = 0;
+let startY = 0;
+
+let centerX = window.innerWidth / 2;
+let centerY = window.innerHeight / 2;
+
+// === РАСЧЁТ СЕТКИ ===
+function calculateGrid() {
+  HORIZONTAL = Math.ceil(window.innerWidth / (SIZE + PADDINGX)) + 4;
+  VERTICAL = Math.ceil(window.innerHeight / (SIZE + PADDINGY)) + 4;
+}
+
+// === СОЗДАНИЕ ИКОНОК ===
+function createIcons() {
+  container.innerHTML = '';
+  circles = [];
+
+  let x = 0;
+  let y = 0;
+  let iconIndex = 0;
+
+  for (let i = 0; i < VERTICAL; i++) {
+    for (let j = 0; j < HORIZONTAL; j++) {
+      const iconObj = icons[iconIndex % icons.length]; 
+      iconIndex++;
+// создаём div
+const el = document.createElement('div');
+el.className = 'icon';
+
+// создаём ссылку внутри div
+const link = document.createElement('a');
+link.href = iconObj.link;
+link.target = '_blank';
+
+// создаём картинку и вставляем в ссылку
+const img = document.createElement('img');
+img.src = iconObj.src;
+img.alt = '';
+
+link.appendChild(img);    // <a><img></a>
+el.appendChild(link);     // <div class="icon"><a><img></a></div>
+
+// добавляем в контейнер
+container.appendChild(el);
+
+      circles.push({ x, y, el });
+
+      x += SIZE + PADDINGX;
+    }
+    x = i % 2 === 0 ? SIZE / 2 : 0;
+    y += SIZE + PADDINGY;
+  }
+
+  // центрируем сетку в родителе
+  const xs = circles.map(c => c.x);
+  const ys = circles.map(c => c.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+
+  const gridWidth = maxX - minX + SIZE;
+  const gridHeight = maxY - minY + SIZE;
+
+  offsetX = (container.clientWidth - gridWidth) / 2 - minX;
+  offsetY = (container.clientHeight - gridHeight) / 2 - minY;
+
+  clampOffsets();
+}
+
+// clampOffsets
+// === ОГРАНИЧЕНИЕ СМЕЩЕНИЯ ===
+function clampOffsets() {
+  if (circles.length === 0) return;
+
+  // находим крайние элементы
+  let minX = Math.min(...circles.map(c => c.x));
+  let maxX = Math.max(...circles.map(c => c.x));
+  let minY = Math.min(...circles.map(c => c.y));
+  let maxY = Math.max(...circles.map(c => c.y));
+
+  // добавляем SIZE/2, чтобы учесть размеры иконок
+  minX -= SIZE / 2;
+  maxX += SIZE / 2;
+  minY -= SIZE / 2;
+  maxY += SIZE / 2;
+
+  // пределы смещения
+  const minOffsetX = centerX - maxX;
+  const maxOffsetX = centerX - minX;
+  const minOffsetY = centerY - maxY;
+  const maxOffsetY = centerY - minY;
+
+  // применяем ограничения
+  offsetX = Math.min(maxOffsetX, Math.max(minOffsetX, offsetX));
+  offsetY = Math.min(maxOffsetY, Math.max(minOffsetY, offsetY));
+}
+
+// === АНИМАЦИЯ ===
+function animate() {
+  for (const circle of circles) {
+    const dx = circle.x - centerX + offsetX;
+    const dy = circle.y - centerY + offsetY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+
+    const scale = Math.max(0, 1 - dist / SCALE_FACTOR);
+
+    circle.el.style.transform = `
+      translate(${circle.x + offsetX}px, ${circle.y + offsetY}px)
+      translate(-50%, -50%)
+      scale(${scale})
+    `;
+  }
+
+  requestAnimationFrame(animate);
+}
+
+// === DRAG (мышь) ===
+window.addEventListener('mousedown', e => {
+  startX = e.clientX;
+  startY = e.clientY;
+  oldOffsetX = offsetX;
+  oldOffsetY = offsetY;
+
+  window.addEventListener('mousemove', move);
+  window.addEventListener('mouseup', stop);
+});
+
+function move(e) {
+  offsetX = oldOffsetX + e.clientX - startX;
+  offsetY = oldOffsetY + e.clientY - startY;
+  clampOffsets();
+}
+
+function stop() {
+  window.removeEventListener('mousemove', move);
+  window.removeEventListener('mouseup', stop);
+}
+
+// === TOUCH ===
+window.addEventListener('touchstart', e => {
+  startX = e.touches[0].clientX;
+  startY = e.touches[0].clientY;
+  oldOffsetX = offsetX;
+  oldOffsetY = offsetY;
+});
+
+window.addEventListener('touchmove', e => {
+  offsetX = oldOffsetX + e.touches[0].clientX - startX;
+  offsetY = oldOffsetY + e.touches[0].clientY - startY;
+  clampOffsets();
+});
+
+// === RESIZE ===
+window.addEventListener('resize', () => {
+  centerX = window.innerWidth / 2;
+  centerY = window.innerHeight / 2;
+  calculateGrid();
+  createIcons();
+});
+
+// === INIT ===
+calculateGrid();
+createIcons();
+animate();
+
+// === КЛИК + ЦЕНТРОВКА + ПОВТОРНЫЙ КЛИК ===
+container.addEventListener('click', e => {
+  const el = e.target.closest('.icon');
+  if (!el) return;
+
+  const circle = circles.find(c => c.el === el);
+  if (!circle) return;
+
+  // Проверяем, в центре ли элемент
+  const screenCenterX = centerX;
+  const screenCenterY = centerY;
+
+  const elScreenX = circle.x + offsetX;
+  const elScreenY = circle.y + offsetY;
+
+  const tolerance = 5; // px, погрешность
+
+  if (
+    Math.abs(elScreenX - screenCenterX) < tolerance &&
+    Math.abs(elScreenY - screenCenterY) < tolerance
+  ) {
+    // Уже в центре → переходим по ссылке
+    window.open(circle.el.href, '_blank');
+    return;
+  }
+
+  // Элемент НЕ в центре → анимируем
+  const targetOffsetX = centerX - circle.x;
+  const targetOffsetY = centerY - circle.y;
+
+  const duration = 400; // ms
+  const startTime = performance.now();
+  const startOffsetX = offsetX;
+  const startOffsetY = offsetY;
+
+  function animateMove(time) {
+    const t = Math.min((time - startTime) / duration, 1);
+    const ease = t * (2 - t); // ease-out
+    offsetX = startOffsetX + (targetOffsetX - startOffsetX) * ease;
+    offsetY = startOffsetY + (targetOffsetY - startOffsetY) * ease;
+
+    clampOffsets(); // ограничиваем смещение во время анимации
+
+    if (t < 1) requestAnimationFrame(animateMove);
+  }
+
+  requestAnimationFrame(animateMove);
+});
+</script>
+
+	</body>
+</html>
