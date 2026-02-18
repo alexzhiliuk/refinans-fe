@@ -4955,6 +4955,9 @@ html {
   background-size: contain;
   background-repeat: no-repeat;
 }
+.features__item:nth-child(2) div::before {
+  background-image: url(../img/minus1.svg);
+}
 .features__item a {
   width: 100%;
   margin-top: auto;
