@@ -2790,7 +2790,7 @@ body.ie ._ibg img {
 }
 @media (max-width: 768px) {
   .speack._v2 {
-    margin-top: 30px;
+    margin-top: 60px;
   }
 }
 @media (max-width: 768px) {
@@ -3791,11 +3791,22 @@ body.ie ._ibg img {
 
 .conditions {
   overflow: hidden;
+  background: #fff;
+  margin-top: 130px;
+}
+@media (max-width: 998px) {
+  .conditions {
+    margin-top: 0;
+  }
+  .conditions._v2 {
+    margin-top: 80px;
+  }
 }
 .conditions__container {
   padding-top: 20px;
   padding-bottom: 20px;
   background: #fff;
+  margin-top: 0;
   display: grid;
   grid-template-columns: 1fr 1.35fr;
 }
@@ -4356,6 +4367,11 @@ body.ie ._ibg img {
 .autor__container {
   margin-top: 20px;
 }
+@media (max-width: 998px) {
+  .autor__container {
+    padding-bottom: 40px;
+  }
+}
 .autor__block {
   margin-top: 20px;
   display: grid;
@@ -4644,6 +4660,7 @@ body.ie ._ibg img {
 }
 @media (min-width: 998px) {
   .article-page__right div {
+    margin-top: 20px;
     height: auto !important;
   }
 }
@@ -5075,8 +5092,17 @@ html {
 .common__slide:nth-child(even) {
   background-image: url(../img/h2.png);
 }
+@media (max-width: 768px) {
+  .common__slide:nth-child(2) {
+    margin-top: 10px;
+  }
+  .common__slide:nth-child(3) {
+    margin-top: 0px !important;
+  }
+}
 @media (max-width: 600px) {
   .common__slide {
     padding: 20px;
+    height: auto !important;
   }
 }
